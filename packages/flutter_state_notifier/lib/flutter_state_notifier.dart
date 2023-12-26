@@ -346,7 +346,8 @@ class _StateNotifierProviderElement<Controller extends StateNotifier<Value>,
 /// `state` changes.
 typedef StateNotifierWidgetListener<StateT> = void Function(
   BuildContext context,
-  StateT state,
+  StateT previous,
+  StateT current,
 );
 
 /// {@template state_notifier_listener}
@@ -356,27 +357,7 @@ typedef StateNotifierWidgetListener<StateT> = void Function(
 /// The [listener] is guaranteed to only be called once for each `state` change
 /// unlike the `builder` in [StateNotifierBuilder].
 ///
-/// ```dart
-/// StateNotifierListener<MyNotifier, MyState>(
-///   value: myNotifier,
-///   listener: (context, state) {
-///     // do stuff here based on MyNotifier's state
-///   },
-///   child: Container(),
-/// )
-/// ```
-/// {@endtemplate}
-///
-/// {@template state_notifier_listener_listen_when}
-/// An optional [listenWhen] can be implemented for more granular control
-/// over when [listener] is called.
-///
-/// If [listenWhen] is omitted, it will default to `true`.
-///
-/// [listenWhen] will be invoked on each [stateNotifier] `state` change.
-/// [listenWhen] takes the previous `state` and current `state` and must
-/// return a [bool] which determines whether or not the [listener] function
-/// will be invoked.
+/// The [listener] also takes the previous `state` and current `state`.
 ///
 /// The previous `state` will be initialized to the `state` of the
 /// [stateNotifier] when the [StateNotifierListener] is initialized.
@@ -384,13 +365,9 @@ typedef StateNotifierWidgetListener<StateT> = void Function(
 /// ```dart
 /// StateNotifierListener<MyNotifier, MyState>(
 ///   value: myNotifier,
-///   listenWhen: (previous, current) {
-///     // return true/false to determine whether or not
-///     // to invoke listener with state
-///   },
-///   listener: (context, state) {
+///   listener: (context, previous, current) {
 ///     // do stuff here based on MyNotifier's state
-///   }
+///   },
 ///   child: Container(),
 /// )
 /// ```
@@ -403,7 +380,6 @@ class StateNotifierListener<NotifierT extends StateNotifier<StateT>, StateT>
     required this.listener,
     required this.stateNotifier,
     required this.child,
-    this.listenWhen,
     this.fireImmediately = true,
   }) : super(key: key);
 
@@ -419,9 +395,6 @@ class StateNotifierListener<NotifierT extends StateNotifier<StateT>, StateT>
   /// This [listener] should be used for any code which needs to execute
   /// in response to a `state` change.
   final StateNotifierWidgetListener<StateT> listener;
-
-  /// {@macro state_notifier_listener_listen_when}
-  final bool Function(StateT previous, StateT current)? listenWhen;
 
   /// The [listener] callback will be called immediately on addition and
   /// synchronously whenever ´state´ changes.
@@ -491,9 +464,7 @@ class _StateNotifierListenerState<NotifierT extends StateNotifier<StateT>,
 
   void _subscribe() {
     _subscription = _notifier.addListener((state) {
-      if (widget.listenWhen?.call(_previousState, state) ?? true) {
-        widget.listener(context, state);
-      }
+      widget.listener(context, _previousState, state);
       _previousState = state;
     }, fireImmediately: widget.fireImmediately);
   }
