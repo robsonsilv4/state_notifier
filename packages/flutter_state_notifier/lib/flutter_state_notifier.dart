@@ -345,14 +345,18 @@ class _StateNotifierProviderElement<Controller extends StateNotifier<Value>,
 /// with the `state` and is responsible for executing in response to
 /// `state` changes.
 typedef StateNotifierWidgetListener<ValueT> = void Function(
-    BuildContext context, ValueT state);
+  BuildContext context,
+  ValueT state,
+);
 
 /// Signature for the `listenWhen` function which takes the previous `state`
 /// and the current `state` and is responsible for returning a [bool] which
 /// determines whether or not to call [StateNotifierWidgetListener] of
 /// [StateNotifierListener] with the current `state`.
 typedef StateNotifierListenerCondition<ValueT> = bool Function(
-    ValueT previous, ValueT current);
+  ValueT previous,
+  ValueT current,
+);
 
 /// {@template state_notifier_listener}
 /// A widget that takes a [StateNotifierWidgetListener] and a [stateNotifier]
