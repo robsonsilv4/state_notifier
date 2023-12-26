@@ -349,15 +349,6 @@ typedef StateNotifierWidgetListener<ValueT> = void Function(
   ValueT state,
 );
 
-/// Signature for the `listenWhen` function which takes the previous `state`
-/// and the current `state` and is responsible for returning a [bool] which
-/// determines whether or not to call [StateNotifierWidgetListener] of
-/// [StateNotifierListener] with the current `state`.
-typedef StateNotifierListenerCondition<ValueT> = bool Function(
-  ValueT previous,
-  ValueT current,
-);
-
 /// {@template state_notifier_listener}
 /// A widget that takes a [StateNotifierWidgetListener] and a [stateNotifier]
 /// and invokes the [listener] in response to `state` changes in the [stateNotifier].
@@ -429,7 +420,7 @@ class StateNotifierListener<NotifierT extends StateNotifier<StateT>, StateT>
   final StateNotifierWidgetListener<StateT> listener;
 
   /// {@macro state_notifier_listener_listen_when}
-  final StateNotifierListenerCondition<StateT>? listenWhen;
+  final bool Function(StateT previous, StateT current)? listenWhen;
 
   @override
   _StateNotifierListenerState<NotifierT, StateT> createState() =>
