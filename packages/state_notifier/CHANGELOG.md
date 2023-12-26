@@ -1,3 +1,8 @@
+## 1.0.0 - 2023-08-16
+
+- `state` is now accessible in tests without a warning.
+- `debugState` is removed Use `state` instead.
+
 ## 0.7.2+1
 
 - Fixed an issue with `updateShouldNotify` naturally always returning `false`.

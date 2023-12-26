@@ -1,6 +1,11 @@
-## 0.8.0
+## 1.1.0
 
 - Added `StateNotifierListener` widget, to invoke listener in response to a `StateNotifier` state changes.
+
+## 1.0.0 - 2023-08-16
+
+- `state` is now accessible in tests without a warning.
+- `debugState` is removed Use `state` instead.
 
 ## 0.7.3
 
