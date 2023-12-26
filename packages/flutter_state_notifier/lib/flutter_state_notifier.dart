@@ -344,9 +344,9 @@ class _StateNotifierProviderElement<Controller extends StateNotifier<Value>,
 /// Signature for the `listener` function which takes the `BuildContext` along
 /// with the `state` and is responsible for executing in response to
 /// `state` changes.
-typedef StateNotifierWidgetListener<ValueT> = void Function(
+typedef StateNotifierWidgetListener<StateT> = void Function(
   BuildContext context,
-  ValueT state,
+  StateT state,
 );
 
 /// {@template state_notifier_listener}
@@ -427,10 +427,10 @@ class StateNotifierListener<NotifierT extends StateNotifier<StateT>, StateT>
       _StateNotifierListenerState<NotifierT, StateT>();
 }
 
-class _StateNotifierListenerState<NotifierT extends StateNotifier<ValueT>,
-    ValueT> extends State<StateNotifierListener<NotifierT, ValueT>> {
+class _StateNotifierListenerState<NotifierT extends StateNotifier<StateT>,
+    StateT> extends State<StateNotifierListener<NotifierT, StateT>> {
   late NotifierT _notifier;
-  late ValueT _previousState;
+  late StateT _previousState;
   void Function()? _subscription;
 
   @override
@@ -443,7 +443,7 @@ class _StateNotifierListenerState<NotifierT extends StateNotifier<ValueT>,
   }
 
   @override
-  void didUpdateWidget(StateNotifierListener<NotifierT, ValueT> oldWidget) {
+  void didUpdateWidget(StateNotifierListener<NotifierT, StateT> oldWidget) {
     super.didUpdateWidget(oldWidget);
     final oldNotifier = oldWidget.stateNotifier;
     final currentNotifier = widget.stateNotifier;
