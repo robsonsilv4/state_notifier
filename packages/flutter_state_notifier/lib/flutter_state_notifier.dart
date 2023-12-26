@@ -404,6 +404,7 @@ class StateNotifierListener<NotifierT extends StateNotifier<StateT>, StateT>
     required this.stateNotifier,
     required this.child,
     this.listenWhen,
+    this.fireImmediately = true,
   }) : super(key: key);
 
   /// The widget which will be rendered as a descendant of the
@@ -421,6 +422,12 @@ class StateNotifierListener<NotifierT extends StateNotifier<StateT>, StateT>
 
   /// {@macro state_notifier_listener_listen_when}
   final bool Function(StateT previous, StateT current)? listenWhen;
+
+  /// The [listener] callback will be called immediately on addition and
+  /// synchronously whenever ´state´ changes.
+  /// Set [fireImmediately] to false if you want to skip the first,
+  /// immediate execution of the [listener].
+  final bool fireImmediately;
 
   @override
   _StateNotifierListenerState<NotifierT, StateT> createState() =>
@@ -494,7 +501,7 @@ class _StateNotifierListenerState<NotifierT extends StateNotifier<StateT>,
         widget.listener(context, state);
       }
       _previousState = state;
-    });
+    }, fireImmediately: widget.fireImmediately);
   }
 
   void _unsubscribe() {
