@@ -346,15 +346,15 @@ class _StateNotifierProviderElement<Controller extends StateNotifier<Value>,
 /// Signature for the `listener` function which takes the `BuildContext` along
 /// with the `state` and is responsible for executing in response to
 /// `state` changes.
-typedef StateNotifierWidgetListener<Value> = void Function(
-    BuildContext context, Value state);
+typedef StateNotifierWidgetListener<ValueT> = void Function(
+    BuildContext context, ValueT state);
 
 /// Signature for the `listenWhen` function which takes the previous `state`
 /// and the current `state` and is responsible for returning a [bool] which
 /// determines whether or not to call [StateNotifierWidgetListener] of
 /// [StateNotifierListener] with the current `state`.
-typedef StateNotifierListenerCondition<Value> = bool Function(
-    Value previous, Value current);
+typedef StateNotifierListenerCondition<ValueT> = bool Function(
+    ValueT previous, ValueT current);
 
 /// {@template state_notifier_listener}
 /// A widget that takes a [StateNotifierWidgetListener] and a [stateNotifier]
@@ -402,7 +402,7 @@ typedef StateNotifierListenerCondition<Value> = bool Function(
 /// )
 /// ```
 /// {@endtemplate}
-class StateNotifierListener<Controller extends StateNotifier<Value>, Value>
+class StateNotifierListener<NotifierT extends StateNotifier<StateT>, StateT>
     extends StatefulWidget {
   /// {@macro state_notifier_listener}
   const StateNotifierListener({
@@ -419,47 +419,47 @@ class StateNotifierListener<Controller extends StateNotifier<Value>, Value>
 
   /// The [stateNotifier] whose `state` will be listened to.
   /// Whenever the [stateNotifier]'s `state` changes, [listener] will be invoked.
-  final Controller stateNotifier;
+  final NotifierT stateNotifier;
 
   /// The [StateNotifierWidgetListener] which will be called on every `state` change.
   /// This [listener] should be used for any code which needs to execute
   /// in response to a `state` change.
-  final StateNotifierWidgetListener<Value> listener;
+  final StateNotifierWidgetListener<StateT> listener;
 
   /// {@macro state_notifier_listener_listen_when}
-  final StateNotifierListenerCondition<Value>? listenWhen;
+  final StateNotifierListenerCondition<StateT>? listenWhen;
 
   @override
-  _StateNotifierListenerState<Controller, Value> createState() =>
-      _StateNotifierListenerState<Controller, Value>();
+  _StateNotifierListenerState<NotifierT, StateT> createState() =>
+      _StateNotifierListenerState<NotifierT, StateT>();
 }
 
-class _StateNotifierListenerState<Controller extends StateNotifier<Value>,
-    Value> extends State<StateNotifierListener<Controller, Value>> {
-  late Controller _controller;
-  late Value _previousState;
-  StreamSubscription<Value>? _subscription;
+class _StateNotifierListenerState<NotifierT extends StateNotifier<ValueT>,
+    ValueT> extends State<StateNotifierListener<NotifierT, ValueT>> {
+  late NotifierT _notifier;
+  late ValueT _previousState;
+  StreamSubscription<ValueT>? _subscription;
 
   @override
   void initState() {
     super.initState();
-    _controller = widget.stateNotifier;
+    _notifier = widget.stateNotifier;
     // ignore: invalid_use_of_protected_member
-    _previousState = _controller.state;
+    _previousState = _notifier.state;
     _subscribe();
   }
 
   @override
-  void didUpdateWidget(StateNotifierListener<Controller, Value> oldWidget) {
+  void didUpdateWidget(StateNotifierListener<NotifierT, ValueT> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final oldController = oldWidget.stateNotifier;
-    final currentController = widget.stateNotifier;
-    if (oldController != currentController) {
+    final oldNotifier = oldWidget.stateNotifier;
+    final currentNotifier = widget.stateNotifier;
+    if (oldNotifier != currentNotifier) {
       if (_subscription != null) {
         _unsubscribe();
-        _controller = currentController;
+        _notifier = currentNotifier;
         // ignore: invalid_use_of_protected_member
-        _previousState = _controller.state;
+        _previousState = _notifier.state;
       }
       _subscribe();
     }
@@ -468,13 +468,13 @@ class _StateNotifierListenerState<Controller extends StateNotifier<Value>,
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final controller = widget.stateNotifier;
-    if (_controller != controller) {
+    final notifier = widget.stateNotifier;
+    if (_notifier != notifier) {
       if (_subscription != null) {
         _unsubscribe();
-        _controller = controller;
+        _notifier = notifier;
         // ignore: invalid_use_of_protected_member
-        _previousState = _controller.state;
+        _previousState = _notifier.state;
       }
       _subscribe();
     }
@@ -492,11 +492,11 @@ class _StateNotifierListenerState<Controller extends StateNotifier<Value>,
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<Controller>('state', _controller));
+    properties.add(DiagnosticsProperty<NotifierT>('state', _notifier));
   }
 
   void _subscribe() {
-    _subscription = _controller.stream.listen((state) {
+    _subscription = _notifier.stream.listen((state) {
       if (widget.listenWhen?.call(_previousState, state) ?? true) {
         widget.listener(context, state);
       }
