@@ -489,12 +489,6 @@ class _StateNotifierListenerState<NotifierT extends StateNotifier<StateT>,
   @override
   Widget build(BuildContext context) => widget.child;
 
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<NotifierT>('state', _notifier));
-  }
-
   void _subscribe() {
     _subscription = _notifier.addListener((state) {
       if (widget.listenWhen?.call(_previousState, state) ?? true) {
