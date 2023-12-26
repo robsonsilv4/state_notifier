@@ -1,7 +1,5 @@
 library flutter_state_notifier;
 
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 // ignore: undefined_hidden_name
@@ -438,7 +436,7 @@ class _StateNotifierListenerState<NotifierT extends StateNotifier<ValueT>,
     ValueT> extends State<StateNotifierListener<NotifierT, ValueT>> {
   late NotifierT _notifier;
   late ValueT _previousState;
-  StreamSubscription<ValueT>? _subscription;
+  void Function()? _subscription;
 
   @override
   void initState() {
@@ -496,7 +494,7 @@ class _StateNotifierListenerState<NotifierT extends StateNotifier<ValueT>,
   }
 
   void _subscribe() {
-    _subscription = _notifier.stream.listen((state) {
+    _subscription = _notifier.addListener((state) {
       if (widget.listenWhen?.call(_previousState, state) ?? true) {
         widget.listener(context, state);
       }
@@ -505,7 +503,7 @@ class _StateNotifierListenerState<NotifierT extends StateNotifier<ValueT>,
   }
 
   void _unsubscribe() {
-    _subscription?.cancel();
+    _subscription?.call();
     _subscription = null;
   }
 }
